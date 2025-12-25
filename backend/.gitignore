@@ -1,0 +1,21 @@
+# --- SECURITY ---
+config/database.php
+connection.php
+.env
+
+# --- SYSTEM FILES ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- LOGS ---
+*.log
+error_log
+access_log
+
+# --- IDE SETTINGS ---
+.vscode/
+.idea/
+
+# --- DEPENDENCIES ---
+vendor/
