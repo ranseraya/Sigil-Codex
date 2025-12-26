@@ -193,7 +193,7 @@ export default function AboutScreen() {
                     />
                   )}
                 </View>
-                <Text style={tw`text-slate-500 text-[10px]`}>{tech.name}</Text>
+                <Text style={tw`text-slate-500 text-[10px] items-center`}>{tech.name}</Text>
               </View>
             ))}
           </View>
@@ -202,7 +202,7 @@ export default function AboutScreen() {
         {/* LINKS & FOOTER */}
         <View style={tw`px-6 mb-6`}>
           <TouchableOpacity
-            onPress={() => openLink("https://github.com/ranseraya")}
+            onPress={() => openLink("https://github.com/ranseraya/Sigil-Codex")}
             style={tw`flex-row justify-center items-center bg-blue-600/10 py-4 rounded-2xl border border-blue-500/30 active:bg-blue-600/20`}
           >
             <Ionicons

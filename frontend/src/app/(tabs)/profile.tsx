@@ -157,11 +157,13 @@ export default function ProfileScreen() {
             onPress={() => router.push("/about")}
           />
 
+
           <ProfileMenuItem
             icon="people-outline"
             label="Meet the Team"
-            onPress={() => router.push("/credits")}
-            />
+            onPress={() => router.push("/team")}
+          />
+
           {/* Tombol Logout */}
           <ProfileMenuItem
             icon="log-out-outline"

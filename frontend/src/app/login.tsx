@@ -72,7 +72,7 @@ export default function LoginScreen() {
     <View style={tw`flex-1 bg-slate-900 justify-center px-6`}>
       <View style={tw`items-center mb-10`}>
         <Text style={tw`text-blue-400 text-3xl font-bold tracking-wider`}>
-          PROMPT VAULT
+          Sigil Codex
         </Text>
         <Text style={tw`text-slate-400 text-sm mt-2`}>
           Your Personal AI Command Center
@@ -84,7 +84,7 @@ export default function LoginScreen() {
           label="Email Address"
           value={email}
           onChangeText={setEmail}
-          placeholder="ex: user@promptvault.com"
+          placeholder="ex: user@sigilcodex.com"
           keyboardType="email-address"
           autoCapitalize="none"
         />

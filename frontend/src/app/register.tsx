@@ -60,7 +60,7 @@ export default function RegisterScreen() {
           CREATE ACCOUNT
         </Text>
         <Text style={tw`text-slate-400 text-sm mt-2`}>
-          Join PromptVault Community
+          Join Sigco Community
         </Text>
       </View>
 
@@ -76,7 +76,7 @@ export default function RegisterScreen() {
           label="Email Address"
           value={email}
           onChangeText={setEmail}
-          placeholder="ex: user@promptvault.com"
+          placeholder="ex: user@sigilcodex.com"
           keyboardType="email-address"
           autoCapitalize="none"
         />

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { SplashScreen, Stack, useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import {
   DarkTheme,
@@ -31,16 +32,15 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
 
-  // State untuk Splash Screen & Auth
-  const [isAppReady, setIsAppReady] = useState<any>(false);
+  // State
+  const [isAppReady, setIsAppReady] = useState(false);
   const [userSession, setUserSession] = useState<any>(null);
 
-  // Animasi Splash
+  // Animasi 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
-    // Konfigurasi Navigation Bar Android (Hidden/Transparan)
     async function configureBar() {
       if (Platform.OS === "android") {
         await NavigationBar.setVisibilityAsync("hidden");
@@ -49,30 +49,34 @@ export default function RootLayout() {
     }
     configureBar();
 
-    // Logic Utama: Cek Login & Jalankan Splash
     async function prepareApp() {
       try {
+        const userData = await AsyncStorage.getItem("user");
+        if (userData) {
+          setUserSession(JSON.parse(userData));
+        }
+
         Animated.spring(scaleAnim, {
           toValue: 1,
           friction: 5,
           useNativeDriver: true,
         }).start();
 
-        await new Promise((resolve) => setTimeout(resolve, 5000)); //Splash screen 5 detik
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        const userData = await AsyncStorage.getItem("user");
-        if (userData) {
-          setUserSession(JSON.parse(userData));
-        }
+        await SplashScreen.hideAsync();
+
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
       } catch (e) {
-        console.warn(e);
+        console.warn("Error preparing app:", e);
       } finally {
         setIsAppReady(true);
       }
     }
+
     prepareApp();
 
-    // Listener Keyboard (Agar navbar tetap hidden)
     const keyboardListener = Keyboard.addListener("keyboardDidHide", () => {
       if (Platform.OS === "android") {
         NavigationBar.setVisibilityAsync("hidden");
@@ -80,70 +84,48 @@ export default function RootLayout() {
     });
 
     return () => keyboardListener.remove();
-  }, [scaleAnim]);
+  }, []);
+
 
   useEffect(() => {
-    if (!isAppReady) return;
+    if (isAppReady) {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(async () => {
 
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 500,
-      useNativeDriver: true,
-    }).start(async () => {
-      // Cek Koneksi Internet
-      const networkState = await NetInfo.fetch();
-      const isOnline = networkState.isConnected;
-
-      // Logika Pengarahan
-      if (userSession) {
-        // KASUS 1: Ada data user tersimpan (Pernah login)
-
-        if (!isOnline) {
-          // Jika Offline, beri tahu user tapi TETAP MASUK
+        const networkState = await NetInfo.fetch();
+        if (userSession && !networkState.isConnected) {
           Toast.show({
             type: "info",
             text1: "Mode Offline 📡",
-            text2: "Anda masuk menggunakan data lokal.",
+            text2: "Masuk menggunakan data lokal.",
             position: "bottom",
           });
         }
 
-        // Langsung lempar ke Dashboard
-        router.replace("/(tabs)");
-      } else {
-        // KASUS 2: Tidak ada sesi (User baru/Logout)
-        router.replace("/login");
-      }
-    });
-  }, [isAppReady, userSession, fadeAnim, router]);
+        if (userSession) {
+          router.replace("/(tabs)");
+        } else {
+          router.replace("/login");
+        }
+      });
+    }
+  }, [isAppReady, userSession]);
 
-  // 3. Redirect setelah App Ready
-  useEffect(() => {
-    if (!isAppReady) return;
-
-    // Animasi Fade Out Splash Screen
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 500,
-      useNativeDriver: true,
-    }).start(() => {
-      // Setelah animasi selesai, arahkan user
-      if (userSession) {
-        router.replace("/(tabs)"); // Ke Dashboard
-      } else {
-        router.replace("/login"); // Ke Login
-      }
-    });
-  }, [isAppReady, userSession, fadeAnim, router]);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <View style={{ flex: 1 }}>
+
         {/* NAVIGASI UTAMA */}
         <Stack>
           <Stack.Screen name="login" options={{ headerShown: false }} />
           <Stack.Screen name="register" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+          {/* Routes Lainnya */}
           <Stack.Screen name="create-prompt" options={{ headerShown: false }} />
           <Stack.Screen name="edit-prompt" options={{ headerShown: false }} />
           <Stack.Screen name="library" options={{ headerShown: false }} />
@@ -153,21 +135,19 @@ export default function RootLayout() {
           <Stack.Screen name="notifications" options={{ headerShown: false }} />
           <Stack.Screen name="privacy" options={{ headerShown: false }} />
           <Stack.Screen name="prompt-detail" options={{ headerShown: false }} />
-          <Stack.Screen name="credits" options={{ headerShown: false }} />
+          <Stack.Screen name="team" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: "modal" }} />
           <Stack.Screen name="index" options={{ headerShown: false }} />
         </Stack>
 
-        {/* SPLASH SCREEN OVERLAY */}
         <Animated.View
+          pointerEvents={isAppReady ? "none" : "auto"}
           style={[
             tw`absolute inset-0 bg-slate-900 justify-center items-center z-50`,
-            {
-              opacity: fadeAnim,
-              pointerEvents: isAppReady ? "none" : "auto",
-            },
+            { opacity: fadeAnim },
           ]}
         >
+          {/* Logo & Teks Animasi */}
           <Animated.View
             style={{ transform: [{ scale: scaleAnim }], alignItems: "center" }}
           >
@@ -179,18 +159,16 @@ export default function RootLayout() {
               />
             </View>
 
-            <Text
-              style={tw`text-white text-4xl font-black tracking-wider mb-2`}
-            >
+            <Text style={tw`text-white text-4xl font-black tracking-wider mb-2`}>
               Sigil <Text style={tw`text-blue-500`}>Codex</Text>
             </Text>
 
-            <Text
-              style={tw`text-slate-400 text-sm font-medium tracking-widest uppercase`}
-            >
+            <Text style={tw`text-slate-400 text-sm font-medium tracking-widest uppercase`}>
               Craft Your Magic
             </Text>
           </Animated.View>
+
+          {/* Footer Copyright */}
           <View style={tw`absolute bottom-10 items-center`}>
             <ActivityIndicator size="small" color="#3b82f6" style={tw`mb-4`} />
             <Text style={tw`text-slate-600 text-[10px]`}>
@@ -198,6 +176,7 @@ export default function RootLayout() {
             </Text>
           </View>
         </Animated.View>
+
         <Toast />
       </View>
       <StatusBar style="light" backgroundColor="transparent" translucent />

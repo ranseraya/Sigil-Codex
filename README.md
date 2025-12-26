@@ -90,17 +90,15 @@ Follow these steps to set up the project locally.
     ```
 5.  Scan the QR code with the **Expo Go** app on your Android/iOS device.
 
-## 👥 Meet the Team (Group 2)
-
 This project was built with dedication by the team at UPN "Veteran" Jawa Timur.
 ## 👥 Development Team
 
 | Nama         |  Role                                |
 | :-----------:|:------------------------------------:|
 | **Ayala**    | **Lead Developer & Fullstack**       |
-| **Rizky**    | **Fullstack**                        |
+| **Rizky**    | **Backend & DevOps**                 |
 | **Narendra** | **UI/UX & Frontend**                 |
-| **Faris**    | **QA & Analyst**                     |
+| **Faris**    | **QA & Documentations**              |
 
 ## 📄 License
 
